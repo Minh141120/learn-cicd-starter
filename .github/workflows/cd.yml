@@ -25,13 +25,16 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-      - name: 'Set up Cloud SDK'
+      - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
           version: '>= 363.0.0'
   
-      - name: 'Use gcloud CLI'
+      - name: Use gcloud CLI
         run: 'gcloud info'
       
-      - name: 'Build Docker Gcloud'
+      - name: Build Docker Gcloud
         run: gcloud builds submit --tag asia-southeast1-docker.pkg.dev/alien-isotope-454313-a9/notely-ar-repo/notely:latest .
+      
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy notely --image asia-southeast1-docker.pkg.dev/alien-isotope-454313-a9/notely-ar-repo/notely:latest --region asia-southeast1 --allow-unauthenticated --project alien-isotope-454313-a9 --max-instances=4
