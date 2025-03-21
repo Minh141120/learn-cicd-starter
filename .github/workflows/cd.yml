@@ -8,6 +8,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Check out code
@@ -35,6 +37,12 @@ jobs:
       
       - name: Build Docker Gcloud
         run: gcloud builds submit --tag asia-southeast1-docker.pkg.dev/alien-isotope-454313-a9/notely-ar-repo/notely:latest .
-      
+
+      - name: Run Migration
+        run: ./scripts/migrateup.sh
+
       - name: Deploy to Cloud Run
         run: gcloud run deploy notely --image asia-southeast1-docker.pkg.dev/alien-isotope-454313-a9/notely-ar-repo/notely:latest --region asia-southeast1 --allow-unauthenticated --project alien-isotope-454313-a9 --max-instances=4
+      
+      - name: Run Git Diff
+        run: git diff
